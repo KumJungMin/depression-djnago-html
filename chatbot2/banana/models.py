@@ -4,6 +4,9 @@ from django.contrib.auth.models import User
 
 # Create your models here.
     
+class Post(models.Model):
+    result = models.CharField(max_length=100)
+
 class User_Chat(models.Model):
     user = models.CharField(max_length=100)
     total = models.IntegerField(null=True, blank=True)

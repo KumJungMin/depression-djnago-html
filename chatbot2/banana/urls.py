@@ -1,15 +1,15 @@
-# from rest_framework.routers import DefaultRouter 
+from rest_framework.routers import DefaultRouter 
 from django.urls import path, include 
 from . import views
 
-# router = DefaultRouter()
-
-# router.register('post', views.PostViewSet),
+router = DefaultRouter()
+router.register('post', views.PostViewSet),
 
 urlpatterns = [
-    # path('', include(router.urls)),
+    path('posts/', include(router.urls)),
     path('hello',views.hello, name="hello"),
-    path('home', views.home, name="home"),
+    path('chart', views.chart, name="chart"),
+    path('', views.home, name="home"),
     path('signup', views.signup, name="signup"),
     path('logout', views.logout, name="logout"),
     path('reserve', views.reserve, name="reserve"),
