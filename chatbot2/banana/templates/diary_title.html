@@ -35,7 +35,7 @@
     <link href="{% static 'assets/js/get-shit-done.js' %}" rel="text/javascript" />   
     <link href="{% static 'assets/js/custom.js' %}" rel="text/javascript" />   
 
-    <title>Document</title>
+    <title>APPLEMANGO</title>
 </head>
 
 <style>
@@ -188,58 +188,53 @@ pre.prettyprint{
 <div class="main">
 <ul>
   <li><a  href="{% url 'home' %}">예약하기</a></li>
-  <li><a class="active" href="{% url 'diary' %}">다이어리</a></li>
+  <li><a class="active" href="{% url 'diary_title' %}">다이어리</a></li>
   <li><a href="{% url 'verification' %}">인증하기</a></li>
   {% comment %} <li><a href="">인증</a></li> {% endcomment %}
-  <li style="float:right"><a href="{ % url 'chart' %}">통계</a></li>
+  <li style="float:right"><a href="{% url 'chart' %}">통계</a></li>
 </ul>
 <div class="container tim-container">
 <br/>
 <br/>
- <span class="gradtext">다이어리</span>
- <br/>
-<br/>
+ <span class="gradtext">다이어리 목록</span>
+ 
     {% if error %}
     {{ error }}
     {% endif %}
 
-    <form  method="POST" action="{% url 'diary'%}" name="form" role="form" style="font-size : 14px;">
+      <!-- 내가 저장한 다이어리 제목이랑 내용 나오나 확인 -->
 
-        {% csrf_token %}
-        <div class="mb-3">
-            <label for="title">제목</label>
-            <input type="text" class="form-control" name="title" id="" style="font-size : 14px;">
-        </div>
-        <div class="mb-3">
-            <label for="detail">상황</label>
-            <textarea name="situation" id="" cols="50" rows="10" class="form-control" style="font-size : 14px;"></textarea>
-        </div>
-        <div class="mb-3">
-            <label for="emotion">감정</label>
-            <select name="emotion" id="emotion">
-                <option name="emotion" value="기쁨">기쁨</option>
-                <option name="emotion" value="혐오">혐오</option>
-                <option name="emotion" value="두려움">두려움</option>
-                <option name="emotion" value="분노">분노</option>
-                <option name="emotion" value="슬픔">슬픔</option>
-                <option name="emotion" value="기타">기타</option>
-            </select>
-            <input type="text" name="other" id="other" placeholder="기타 감정을 적어주세요." style="font-size : 14px;">
-        </div>
-        <br>
-        <div class="mb-3">
-            <label for="score">감정점수</label>
-            <input type="text" name="score" id="" class="form-control" style="font-size : 14px;">
-        </div>
-        <div class="mb-3">
-            <label for="detail">어떤 감정이 들었는지 자세히 적어주세요.</label>
-            <textarea name="detail" id="" cols="50" rows="10" class="form-control" style="font-size : 14px;"></textarea>
-        </div>
-        <br>
-        <input type="submit" name="submit" value="다이어리 저장하기" class="form-control btn btn-warning" style="color : white; font-size : 14px; ">
-    </form>
-
-    <a href="{% url 'home' %}">home</a>
+   {% if user.is_authenticated %}
+   <a href="{% url 'diary' %}"> 
+      <input class=" btn btn-warning" style="color : white; font-size : 14px; margin : 3px; float : right;" value="작성하기"/>
+   </a>
+   
+   <table class="table table-striped" style="font-size : 14px;">
+      <thead>
+         <tr>
+            <th>제목</th>
+            <th>감정</th>
+            <th>날짜</th>
+            <th>자세히 보기</th>
+         </tr>
+      </thead>
+   {% for diary in diarys %}
+   <tbody>
+      <tr>
+         <td>{{diary.title}}</td>
+         <td>{{diary.emotion}}</td>
+         <td>{{diary.date.date}}</td>
+         <td><a href="{% url 'diary_detail' diary.pk %}">자세히</a></td>
+         <br>
+      </tr>
+   {% endfor %}
+      
+   </tbody>
+   <table>
+   <br>
+   <br>
+   <!-- 확인 완료 -->
+   {% endif %}
 
    
 
@@ -261,6 +256,16 @@ pre.prettyprint{
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
 
 
 

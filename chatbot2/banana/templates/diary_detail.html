@@ -35,7 +35,7 @@
     <link href="{% static 'assets/js/get-shit-done.js' %}" rel="text/javascript" />   
     <link href="{% static 'assets/js/custom.js' %}" rel="text/javascript" />   
 
-    <title>Document</title>
+    <title>APPLEMANGO</title>
 </head>
 
 <style>
@@ -203,20 +203,27 @@ pre.prettyprint{
     {{ error }}
     {% endif %}
 
-    <form  method="POST" action="{% url 'diary'%}" name="form" role="form" style="font-size : 14px;">
+    <form  method="POST" action="{% url 'diary_detail' diary.pk %}" name="form" role="form" style="font-size : 14px;">
 
         {% csrf_token %}
         <div class="mb-3">
             <label for="title">제목</label>
-            <input type="text" class="form-control" name="title" id="" style="font-size : 14px;">
+            <input type="text" class="form-control" name="title" id="" style="font-size : 14px;" value="{{ diary.title }}">
+        </div>
+        
+        <div class="mb-3">
+            <label for="date" >날짜</label>
+            <input type="text" name="date" class="form-control" style="font-size : 14px;" value="{{ diary.date }}" readonly>
         </div>
         <div class="mb-3">
             <label for="detail">상황</label>
-            <textarea name="situation" id="" cols="50" rows="10" class="form-control" style="font-size : 14px;"></textarea>
+            <textarea name="situation" id="" cols="50" rows="10" class="form-control" style="font-size : 14px;">{{ diary.situation }}</textarea>
         </div>
         <div class="mb-3">
             <label for="emotion">감정</label>
-            <select name="emotion" id="emotion">
+            <select name="emotion" id="emotion" value="{{diary.emotion}}">
+                <option name="emotion" value="{{diary.emotion}}">{{diary.emotion}}</option>
+                <option value=""><hr></option>
                 <option name="emotion" value="기쁨">기쁨</option>
                 <option name="emotion" value="혐오">혐오</option>
                 <option name="emotion" value="두려움">두려움</option>
@@ -224,20 +231,37 @@ pre.prettyprint{
                 <option name="emotion" value="슬픔">슬픔</option>
                 <option name="emotion" value="기타">기타</option>
             </select>
-            <input type="text" name="other" id="other" placeholder="기타 감정을 적어주세요." style="font-size : 14px;">
+            <input type="text" name="other" id="other" placeholder="기타 감정을 적어주세요." style="font-size : 14px;" value="{{diary.other}}">
         </div>
         <br>
         <div class="mb-3">
             <label for="score">감정점수</label>
-            <input type="text" name="score" id="" class="form-control" style="font-size : 14px;">
+            <input type="text" name="score" id="" class="form-control" style="font-size : 14px;" value="{{diary.score}}">
         </div>
         <div class="mb-3">
             <label for="detail">어떤 감정이 들었는지 자세히 적어주세요.</label>
-            <textarea name="detail" id="" cols="50" rows="10" class="form-control" style="font-size : 14px;"></textarea>
+            <textarea name="detail" id="" cols="50" rows="10" class="form-control" style="font-size : 14px;">{{diary.detail}}</textarea>
         </div>
         <br>
-        <input type="submit" name="submit" value="다이어리 저장하기" class="form-control btn btn-warning" style="color : white; font-size : 14px; ">
+        <input type="submit" name="submit" value="수정" class="form-control btn btn-warning" style="color : white; font-size : 14px; ">
     </form>
+<hr>
+    <form action="{% url 'diary_delete' diary.pk %}" method="POST" id="delete_diary" onclick="con()">
+        {% csrf_token %}
+        <input type="button" class="form-control btn btn-warning" style="color : white; font-size : 14px;" value="delete">
+    </form>
+    <script>
+        form = document.getElementById('delete_diary')
+        function con(){
+            var result = confirm('정말로 삭제하시겠습니까?')
+            if (result==true){
+                alert('삭제되었습니다.')
+                form.submit()
+            } else{
+                return;
+            }
+        }
+    </script>
 
     <a href="{% url 'home' %}">home</a>
 

@@ -1,5 +1,5 @@
 import json
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework import viewsets
 from django.http import HttpResponse, JsonResponse
 from .models import *
@@ -92,11 +92,6 @@ def reverseQ(block_index, utterance):
 # chatbot's view end 
 
 def home(request):
-    userList = User.objects.all().filter(username=request.user)
-    if userList:
-        author = userList[0]
-        diarys = Diary.objects.all().filter(author=author)
-        return render(request, 'home.html', {'diarys':diarys}) 
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -108,18 +103,52 @@ def home(request):
             return render(request, 'home.html', {'error':'아이디 혹은 비밀번호가 맞지 않습니다.'})    
     return render(request, 'home.html')
 
+# diary 조회
+def diary_title(request):
+    userList = User.objects.all().filter(username=request.user)
+    if userList:
+        author = userList[0]
+        diarys = Diary.objects.all().filter(author=author)
+        return render(request, 'diary_title.html', {'diarys':diarys}) 
+    else:
+        return render(request, 'diary_title.html')
+
+def diary_delete(request, pk):
+    deleted_diary = get_object_or_404(Diary, pk=pk)
+    if request.method == 'POST':
+        deleted_diary.delete()
+        return redirect('diary_title')
+    
+def diary_update(request, pk):
+    updated_diary = get_object_or_404(Diary, pk=pk)
+    
+# diary 세부내용
+def diary_detail(request, pk):
+    diary_detail = get_object_or_404(Diary, pk=pk)
+    # 수정 버튼을 누르면
+    if request.method == 'POST':
+        diary_detail.title = request.POST['title']
+        diary_detail.situation = request.POST['situation']
+        diary_detail.emotion = request.POST['emotion']
+        diary_detail.other = request.POST['other']
+        diary_detail.score = request.POST['score']
+        diary_detail.detail = request.POST['detail']
+        diary_detail.save()
+        return redirect('diary_title')
+    return render(request, 'diary_detail.html', {'diary':diary_detail})
+
 def diary(request):
     if request.method == 'POST':
         title = request.POST['title']
-        date = request.POST['date']
-        score = request.POST['score']
+        date = timezone.now()
+        situation = request.POST['situation']
         emotion = request.POST['emotion']
         other = request.POST['other']
         score = request.POST['score']
         detail = request.POST['detail']
-        diary_info = Diary(title=title, date=date, emotion=emotion, other=other, score=score, detail=detail, author=request.user)
+        diary_info = Diary(title=title, date=date, situation=situation, emotion=emotion, other=other, score=score, detail=detail, author=request.user)
         diary_info.save()
-        return redirect('diary')
+        return redirect('diary_title')
     else:
         messages.add_message(request, messages.ERROR, '오류')
     return render(request, 'diary.html')
@@ -128,11 +157,15 @@ def diary(request):
 def signup(request):
     if request.method == 'POST':
         if request.POST['password1'] == request.POST['password2']:
-            user = User.objects.create_user(
-                request.POST['username'], password=request.POST['password1']
-            )
-            auth.login(request, user)
-            return redirect('home')
+            try: 
+                the_user = User.objects.get(username=request.POST['username'])
+                return render(request, 'signup.html', {'error':'이미 사용중인 아이디입니다.'})
+            except User.DoesNotExist:
+                user = User.objects.create_user(
+                    request.POST['username'], password=request.POST['password1']
+                )
+                auth.login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+                return redirect('home')
     return render(request, 'signup.html')
 
 def logout(request):
@@ -171,7 +204,7 @@ def reserve(request):
 
 def socialLogin(request):
    login_request_uri = 'https://kauth.kakao.com/oauth/authorize?'
-   client_id = '734408998612482f00ad4096fda15b12'
+   client_id = '78acae61f65d913e9dda7218f711e511'
    redirect_uri = 'http://localhost:8000/accounts/oauth'
    login_request_uri += 'client_id=' + client_id
    login_request_uri += '&redirect_uri=' + redirect_uri

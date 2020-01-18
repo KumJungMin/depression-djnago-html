@@ -17,4 +17,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('oauth/', views.oauth, name="oauth"),
     path('verification', views.verification, name="verification"),
+    path('diary_title', views.diary_title, name="diary_title"),
+    path('diary_detail/<int:pk>', views.diary_detail, name="diary_detail"),
+    path('diary_delete/<int:pk>', views.diary_delete, name="diary_delete"),
 ] 
